@@ -1,0 +1,4 @@
+node_modules/
+uploads/
+.env
+_cache_index.json

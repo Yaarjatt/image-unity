@@ -1,0 +1,13 @@
+{
+  "name": "image-unity-bridge",
+  "version": "2.0.0",
+  "description": "Bridge to free AI image generators - No API keys required",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

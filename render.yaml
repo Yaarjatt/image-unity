@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: image-unity-bridge
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/index.js
+    envVars:
+      - key: PORT
+        value: 10000

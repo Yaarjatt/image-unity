@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Unity Bridge - Free AI Image Generator Hub</title>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0d17;--surface:#11162b;--surface2:#1a2140;--border:#2a3460;--text:#e8edff;--text2:#8892b0;--accent:#6c63ff;--accent2:#4db5ff;--radius:12px;--radius-sm:8px;--font:'Segoe UI',system-ui,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+.container{max-width:1300px;margin:0 auto;padding:0 20px}
+
+/* Header */
+header{padding:20px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.logo{font-size:1.4rem;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px}
+.logo em{font-style:normal;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tagline{color:var(--text2);font-size:.85rem}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;margin:20px 0;border-bottom:1px solid var(--border);padding-bottom:0;flex-wrap:wrap}
+.tab{padding:10px 20px;border-radius:8px 8px 0 0;cursor:pointer;color:var(--text2);font-size:.9rem;font-weight:500;transition:all .2s;border:1px solid transparent;border-bottom:none;margin-bottom:-1px}
+.tab:hover{color:var(--text);background:var(--surface)}
+.tab.active{color:var(--text);background:var(--surface);border-color:var(--border);border-bottom-color:var(--surface)}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Dashboard - site grid */
+.site-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:16px;margin:20px 0}
+.site-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s}
+.site-card:hover{border-color:var(--accent)}
+.site-card .site-header{padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:var(--surface2);border-bottom:1px solid var(--border)}
+.site-card .site-header .site-name{font-weight:600;font-size:.9rem}
+.site-card .site-header .site-badge{font-size:.7rem;padding:3px 10px;border-radius:100px;background:rgba(108,99,255,0.2);color:var(--accent2)}
+.site-card iframe{width:100%;height:450px;border:none;background:#fff}
+
+/* Generator panel */
+.generator-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin:20px 0}
+.generator-panel h2{font-size:1.2rem;margin-bottom:16px}
+.generator-panel h2 small{font-weight:400;font-size:.85rem;color:var(--text2)}
+.input-group{margin-bottom:16px}
+.input-group textarea{width:100%;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:.95rem;font-family:var(--font);resize:vertical;min-height:80px;outline:none}
+.input-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,0.2)}
+.options-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.option-group{display:flex;flex-direction:column;gap:4px}
+.option-group label{font-size:.7rem;text-transform:uppercase;color:var(--text2);font-weight:600;letter-spacing:.5px}
+.option-group select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius-sm);font-size:.85rem;cursor:pointer;outline:none;font-family:var(--font)}
+.generate-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--accent),#867dff);border:none;border-radius:var(--radius-sm);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:all .25s;font-family:var(--font)}
+.generate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(108,99,255,0.3)}
+.generate-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* Result */
+.result-area{margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);display:none}
+.result-area.visible{display:block}
+.result-area img{max-width:100%;max-height:500px;border-radius:8px;display:block;margin:0 auto}
+.result-info{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:.8rem;color:var(--text2);flex-wrap:wrap;gap:8px}
+.result-actions{display:flex;gap:8px}
+.result-actions button{padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);cursor:pointer;font-size:.8rem;transition:all .2s;font-family:var(--font)}
+.result-actions button:hover{background:var(--border)}
+
+/* API Docs */
+.api-docs{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin:20px 0}
+.api-docs h3{color:var(--accent2);margin-bottom:12px;font-size:1.05rem}
+.api-docs pre{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;overflow-x:auto;font-family:'SF Mono',monospace;font-size:.8rem;color:var(--text2);margin:8px 0}
+.endpoint{display:inline-block;color:#fff;padding:2px 10px;border-radius:4px;font-size:.75rem;font-weight:600;margin-right:8px;font-family:monospace}
+.endpoint.get{background:#4ccea0;color:#000}
+.endpoint.post{background:var(--accent)}
+
+/* Loading */
+.loading-spinner{display:inline-block;width:20px;height:20px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+footer{text-align:center;padding:30px 0;color:var(--text2);font-size:.8rem;border-top:1px solid var(--border);margin-top:40px}
+
+@media(max-width:700px){
+.site-grid{grid-template-columns:1fr}
+.site-card iframe{height:350px}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<header>
+<div class="logo">&#127912; Image <em>Unity</em> <span class="tagline">Bridge</span></div>
+<div class="tagline">5 free AI image generators &bull; No API keys &bull; Zero cost</div>
+</header>
+
+<div class="tabs">
+<div class="tab active" onclick="switchTab('dashboard')">&#127760; Dashboard</div>
+<div class="tab" onclick="switchTab('generator')">&#9889; AI Generator</div>
+<div class="tab" onclick="switchTab('api')">&#128220; API</div>
+</div>
+
+<!-- TAB 1: DASHBOARD -->
+<div class="tab-content active" id="tab-dashboard">
+<p style="color:var(--text2);margin:10px 0;font-size:.9rem">
+Click on any site below. Solve the captcha (if any), type your prompt, and generate images. Our system automatically detects generated images and lets you save them.
+</p>
+<div class="site-grid" id="siteGrid">
+<div class="site-card"><div class="site-header"><span class="site-name">&#127760; Loading...</span></div></div>
+</div>
+</div>
+
+<!-- TAB 2: GENERATOR -->
+<div class="tab-content" id="tab-generator">
+<div class="generator-panel">
+<h2>AI Image Generator <small>powered by Puter.js - no API key needed</small></h2>
+<div class="input-group">
+<textarea id="promptInput" placeholder="Describe the image you want...&#10;Example: A majestic dragon soaring over a neon-lit cyberpunk city, cinematic lighting">A beautiful serene mountain landscape at sunset with a calm lake reflecting the colors</textarea>
+</div>
+<div class="options-row">
+<div class="option-group">
+<label>Model</label>
+<select id="modelSelect">
+<option value="gpt-image-2">GPT Image 2 (Best Quality)</option>
+<option value="gpt-image-1.5">GPT Image 1.5</option>
+<option value="gemini-3.1-flash-image-preview">Gemini 3.1 Flash</option>
+<option value="gemini-2.5-flash-image-preview">Gemini 2.5 Flash (Nano Banana)</option>
+<option value="black-forest-labs/flux-schnell">FLUX.1 Schnell (Fast)</option>
+<option value="stabilityai/stable-diffusion-3-medium">Stable Diffusion 3</option>
+<option value="ByteDance-Seed/Seedream-4.0">Seedream 4.0</option>
+<option value="dall-e-3">DALL-E 3</option>
+</select>
+</div>
+<div class="option-group">
+<label>Style</label>
+<select id="styleSelect">
+<option value="">Default</option>
+<option value="photorealistic">Photorealistic</option>
+<option value="anime">Anime</option>
+<option value="cinematic">Cinematic</option>
+<option value="digital-art">Digital Art</option>
+<option value="oil-painting">Oil Painting</option>
+</select>
+</div>
+</div>
+<button class="generate-btn" id="generateBtn" onclick="generateImage()">&#10024; Generate Image</button>
+
+<div class="result-area" id="resultArea">
+<img id="resultImage" src="" alt="Generated image">
+<div class="result-info">
+<div id="resultMeta"></div>
+<div class="result-actions">
+<button onclick="downloadResult()">&#11015; Download</button>
+<button onclick="copyResultUrl()">&#128279; Copy URL</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- TAB 3: API -->
+<div class="tab-content" id="tab-api">
+<div class="api-docs">
+<h3>API Endpoints</h3>
+<p style="color:var(--text2);margin-bottom:12px">Use these endpoints to generate images programmatically. No API key required.</p>
+
+<p style="color:var(--text2);margin-bottom:6px"><span class="endpoint post">POST</span> <code>/api/generate</code> &mdash; Start a generation session</p>
+<pre>curl -X POST https://image-unity.onrender.com/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"A futuristic city","model":"gpt-image-2"}'</pre>
+
+<p style="color:var(--text2);margin-bottom:6px"><span class="endpoint get">GET</span> <code>/api/session/:id/generate</code> &mdash; Trigger Puter.js generation</p>
+<p style="color:var(--text2);margin-bottom:6px"><span class="endpoint get">GET</span> <code>/api/proxy/:site</code> &mdash; Proxy a free site (iframe-friendly)</p>
+<p style="color:var(--text2);margin-bottom:6px"><span class="endpoint get">GET</span> <code>/api/sites</code> &mdash; List all available sites</p>
+</div>
+</div>
+
+</div>
+
+<footer>
+<strong>Image Unity Bridge</strong> &mdash; Connecting to imagefree.org &bull; freegen.app &bull; draw.freeforai.com &bull; aifreeforever.com &bull; perchance.org<br>
+<span style="font-size:.75rem">No API keys. No login. Pure free image generation.</span>
+</footer>
+
+<script>
+// ===== Tab Switching =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelector('.tab[onclick*="'+tab+'"]').classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+}
+
+// ===== Dashboard - Load Sites =====
+async function loadSites() {
+  try {
+    const resp = await fetch('/api/sites');
+    const data = await resp.json();
+    const grid = document.getElementById('siteGrid');
+    grid.innerHTML = '';
+    data.sites.forEach(site => {
+      grid.innerHTML += '<div class="site-card">'
+        + '<div class="site-header">'
+        + '<span class="site-name">' + site.name + '</span>'
+        + '<span class="site-badge">Free &bull; No Login</span>'
+        + '</div>'
+        + '<iframe src="'+site.proxyUrl+'" sandbox="allow-scripts allow-forms allow-same-origin" loading="lazy"></iframe>'
+        + '</div>';
+    });
+  } catch(e) {
+    document.getElementById('siteGrid').innerHTML = '<p style="color:var(--red)">Error loading sites</p>';
+  }
+}
+
+// Listen for images detected in iframes
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'IMAGE_DETECTED') {
+    console.log('Image detected:', e.data.site, e.data.src);
+  }
+  if (e.data && e.data.type === 'PUTER_IMAGE_READY') {
+    // An image was generated via Puter.js in a child window
+    console.log('Puter image:', e.data.sessionId, e.data.src);
+  }
+});
+
+// ===== Generator =====
+async function generateImage() {
+  const prompt = document.getElementById('promptInput').value.trim();
+  if (!prompt) { alert('Please enter a prompt'); return; }
+  
+  const btn = document.getElementById('generateBtn');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="loading-spinner"></span> Generating...';
+  btn.disabled = true;
+  document.getElementById('resultArea').classList.remove('visible');
+
+  try {
+    const model = document.getElementById('modelSelect').value;
+    const style = document.getElementById('styleSelect').value;
+    let finalPrompt = prompt;
+    if (style) {
+      const styleMap = {photorealistic:'photorealistic, ultra detailed, 8K',anime:'anime style, vibrant colors',cinematic:'cinematic, dramatic lighting', 'digital-art':'digital art, concept art','oil-painting':'oil painting, canvas texture'};
+      finalPrompt = prompt + ', ' + (styleMap[style] || style);
+    }
+
+    // Use Puter.js directly - no API key needed
+    const img = await puter.ai.txt2img(finalPrompt, { model: model });
+    
+    document.getElementById('resultImage').src = img.src;
+    document.getElementById('resultImage').style.display = 'block';
+    document.getElementById('resultMeta').textContent = 'Generated with ' + model + ' | ' + prompt.slice(0,60) + '...';
+    document.getElementById('resultArea').classList.add('visible');
+    
+    // Store for download
+    window.__lastResult = img.src;
+  } catch(e) {
+    alert('Error: ' + e.message);
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+function downloadResult() {
+  if (!window.__lastResult) return;
+  const a = document.createElement('a');
+  a.href = window.__lastResult;
+  a.download = 'image-unity-' + Date.now() + '.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function copyResultUrl() {
+  if (!window.__lastResult) return;
+  navigator.clipboard.writeText(window.__lastResult).then(() => {
+    alert('URL copied to clipboard!');
+  });
+}
+
+// ===== Init =====
+loadSites();
+</script>
+
+</body>
+</html>
